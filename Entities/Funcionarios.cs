@@ -25,5 +25,8 @@ namespace API_SQLServer.Entities
         [Column("cargo_id")]
         [ForeignKey("CargoId")]
         public int CargoId { get; set; }
+
+        // Propriedade de navegação para o relacionamento com Cargos
+        public Cargos Cargo { get; set; }
     }
 }

@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace API_SQLServer.Migrations
 {
     [DbContext(typeof(ABCIncContext))]
-    [Migration("20231120221707_CriacaoTablesABCInc")]
+    [Migration("20231122142717_CriacaoTablesABCInc")]
     partial class CriacaoTablesABCInc
     {
         /// <inheritdoc />
@@ -43,11 +43,13 @@ namespace API_SQLServer.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("nome");
 
-                    b.Property<int>("salario")
+                    b.Property<int>("Salario")
                         .HasColumnType("int")
                         .HasColumnName("salario");
 
                     b.HasKey("CargoId");
+
+                    b.HasIndex("DepartamentoId");
 
                     b.ToTable("Cargos");
                 });
@@ -100,7 +102,31 @@ namespace API_SQLServer.Migrations
 
                     b.HasKey("FuncionarioId");
 
+                    b.HasIndex("CargoId");
+
                     b.ToTable("Funcionarios");
+                });
+
+            modelBuilder.Entity("API_SQLServer.Entities.Cargos", b =>
+                {
+                    b.HasOne("API_SQLServer.Entities.Departamentos", "Departamento")
+                        .WithMany()
+                        .HasForeignKey("DepartamentoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Departamento");
+                });
+
+            modelBuilder.Entity("API_SQLServer.Entities.Funcionarios", b =>
+                {
+                    b.HasOne("API_SQLServer.Entities.Cargos", "Cargo")
+                        .WithMany()
+                        .HasForeignKey("CargoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Cargo");
                 });
 #pragma warning restore 612, 618
         }

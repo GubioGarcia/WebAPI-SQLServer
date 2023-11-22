@@ -21,6 +21,9 @@ namespace API_SQLServer.Entities
         public string Nome { get; set; }
 
         [Column("salario")]
-        public int salario { get; set; }
+        public int Salario { get; set; }
+
+        // Propriedade de navegação para o relacionamento com Departamentos
+        public Departamentos Departamento { get; set; }
     }
 }

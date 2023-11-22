@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Data;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using API_SQLServer.Context;
 using API_SQLServer.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace API_SQLServer.Controllers
 {
@@ -12,180 +13,389 @@ namespace API_SQLServer.Controllers
     [Route("[controller]")]
     public class ABCIncController : ControllerBase
     {
-        // Injeção de dependência -> recebe via construtor ABCIncContext, context que possibilita o acesso ao Db
-        private readonly ABCIncContext _context; // atributo somente leitura
+        private readonly ABCIncContext _context;
 
-        public ABCIncController (ABCIncContext context) //Construtor
+        public ABCIncController(ABCIncContext context)
         {
             _context = context;
         }
 
-    // Criar
+        // Criar
         [HttpPost("CriarCargo")]
-        public IActionResult CriarCargo (Cargos cargo)
+        public IActionResult CriarCargo(Cargos cargo)
         {
-            _context.Add(cargo);
-            _context.SaveChanges();
+            using (SqlConnection connection = new SqlConnection(_context.Database.GetDbConnection().ConnectionString))
+            {
+                connection.Open();
+                string sql = "INSERT INTO Cargos (departamento_id, nome, salario) VALUES (@DepartamentoId, @Nome, @Salario);";
+                using (SqlCommand command = new SqlCommand(sql, connection))
+                {
+                    command.Parameters.AddWithValue("@DepartamentoId", cargo.DepartamentoId);
+                    command.Parameters.AddWithValue("@Nome", cargo.Nome);
+                    command.Parameters.AddWithValue("@Salario", cargo.Salario);
+                    command.ExecuteNonQuery();
+                }
+            }
             return Ok(cargo);
         }
 
         [HttpPost("CriarDepartamento")]
-        public IActionResult CriarDepartamento (Departamentos departamento)
+        public IActionResult CriarDepartamento(Departamentos departamento)
         {
-            _context.Add(departamento);
-            _context.SaveChanges();
+            using (SqlConnection connection = new SqlConnection(_context.Database.GetDbConnection().ConnectionString))
+            {
+                connection.Open();
+                string sql = "INSERT INTO Departamentos (nome) VALUES (@Nome);";
+                using (SqlCommand command = new SqlCommand(sql, connection))
+                {
+                    command.Parameters.AddWithValue("@Nome", departamento.Nome);
+                    command.ExecuteNonQuery();
+                }
+            }
             return Ok(departamento);
         }
-    
+
         [HttpPost("CriarFuncionario")]
-        public IActionResult CriarFuncionario (Funcionarios funcionario)
+        public IActionResult CriarFuncionario(Funcionarios funcionario)
         {
-            _context.Add(funcionario);
-            _context.SaveChanges();
+            using (SqlConnection connection = new SqlConnection(_context.Database.GetDbConnection().ConnectionString))
+            {
+                connection.Open();
+                string sql = "INSERT INTO Funcionarios (nome, data_contratacao, email, cargo_id) VALUES (@Nome, @DataContratacao, @Email, @CargoId);";
+                using (SqlCommand command = new SqlCommand(sql, connection))
+                {
+                    command.Parameters.AddWithValue("@Nome", funcionario.Nome);
+                    command.Parameters.AddWithValue("@DataContratacao", funcionario.DataContratacao);
+                    command.Parameters.AddWithValue("@Email", funcionario.Email);
+                    command.Parameters.AddWithValue("@CargoId", funcionario.CargoId);
+                    command.ExecuteNonQuery();
+                }
+            }
             return Ok(funcionario);
         }
 
-    // Deletar
-        [HttpDelete("DeletarCargo{id}")]
-        public IActionResult DeletarCargo (int id)
+        // Deletar
+        [HttpDelete("DeletarCargo/{id}")]
+        public IActionResult DeletarCargo(int id)
         {
-            var cargoDb = _context.Cargos.Find(id);
-            if (cargoDb == null) return NotFound();
-
-            _context.Cargos.Remove(cargoDb);
-            _context.SaveChanges();
+            using (SqlConnection connection = new SqlConnection(_context.Database.GetDbConnection().ConnectionString))
+            {
+                connection.Open();
+                string sql = "DELETE FROM Cargos WHERE cargo_id = @CargoId;";
+                using (SqlCommand command = new SqlCommand(sql, connection))
+                {
+                    command.Parameters.AddWithValue("@CargoId", id);
+                    int rowsAffected = command.ExecuteNonQuery();
+                    if (rowsAffected == 0) return NotFound();
+                }
+            }
             return NoContent();
         }
 
-        [HttpDelete("DeletarDepartamento{id}")]
-        public IActionResult DeletarDepartamento (int id)
+        [HttpDelete("DeletarDepartamento/{id}")]
+        public IActionResult DeletarDepartamento(int id)
         {
-            var departamentoDb = _context.Departamentos.Find(id);
-            if (departamentoDb == null) return NotFound();
-
-            _context.Departamentos.Remove(departamentoDb);
-            _context.SaveChanges();
+            using (SqlConnection connection = new SqlConnection(_context.Database.GetDbConnection().ConnectionString))
+            {
+                connection.Open();
+                string sql = "DELETE FROM Departamentos WHERE departamento_id = @DepartamentoId;";
+                using (SqlCommand command = new SqlCommand(sql, connection))
+                {
+                    command.Parameters.AddWithValue("@DepartamentoId", id);
+                    int rowsAffected = command.ExecuteNonQuery();
+                    if (rowsAffected == 0) return NotFound();
+                }
+            }
             return NoContent();
         }
 
-        [HttpDelete("DeletarFuncionario{id}")]
-        public IActionResult DeletarFuncionario (int id)
+        [HttpDelete("DeletarFuncionario/{id}")]
+        public IActionResult DeletarFuncionario(int id)
         {
-            var funcionarioDb = _context.Cargos.Find(id);
-            if (funcionarioDb == null) return NotFound();
-
-            _context.Cargos.Remove(funcionarioDb);
-            _context.SaveChanges();
+            using (SqlConnection connection = new SqlConnection(_context.Database.GetDbConnection().ConnectionString))
+            {
+                connection.Open();
+                string sql = "DELETE FROM Funcionarios WHERE funcionario_id = @FuncionarioId;";
+                using (SqlCommand command = new SqlCommand(sql, connection))
+                {
+                    command.Parameters.AddWithValue("@FuncionarioId", id);
+                    int rowsAffected = command.ExecuteNonQuery();
+                    if (rowsAffected == 0) return NotFound();
+                }
+            }
             return NoContent();
         }
 
-    // Atualizar
-        [HttpPut("AtualizarCargo{id}")]
-        public IActionResult AtualizarCargo (int id, Cargos cargo)
+        // Atualizar
+        [HttpPut("AtualizarCargo/{id}")]
+        public IActionResult AtualizarCargo(int id, Cargos cargo)
         {
-            var cargoDb = _context.Cargos.Find(id);
-            if (cargoDb == null) return NotFound(); // Verificar se cargo é válido
+            using (SqlConnection connection = new SqlConnection(_context.Database.GetDbConnection().ConnectionString))
+            {
+                connection.Open();
+                string sql = "UPDATE Cargos SET departamento_id = @DepartamentoId, nome = @Nome, salario = @Salario WHERE cargo_id = @CargoId;";
+                using (SqlCommand command = new SqlCommand(sql, connection))
+                {
+                    command.Parameters.AddWithValue("@CargoId", id);
+                    command.Parameters.AddWithValue("@DepartamentoId", cargo.DepartamentoId);
+                    command.Parameters.AddWithValue("@Nome", cargo.Nome);
+                    command.Parameters.AddWithValue("@Salario", cargo.Salario);
 
-            // Atualiza a propriedade no Db pela requisição
-            cargoDb.DepartamentoId = cargo.DepartamentoId;
-            cargoDb.Nome = cargo.Nome;
-            cargoDb.salario = cargo.salario;
-
-            _context.Cargos.Update(cargoDb);
-            _context.SaveChanges();
-
-            return Ok(cargoDb);
-        }
-
-        [HttpPut("AtualizarDepartamento{id}")]
-        public IActionResult AtualizarDepartamento (int id, Departamentos departamento)
-        {
-            var departamentoDb = _context.Departamentos.Find(id);
-            if (departamentoDb == null) return NotFound();
-
-            // Atualiza a propriedade no Db pela requisição
-            departamentoDb.Nome = departamento.Nome;
-
-            _context.Departamentos.Update(departamentoDb);
-            _context.SaveChanges();
-
-            return Ok(departamentoDb);
-        }
-
-        [HttpPut("AtualizarFuncionario{id}")]
-        public IActionResult AtualizarFuncionario (int id, Funcionarios funcionario)
-        {
-            var funcionarioDb = _context.Funcionarios.Find(id);
-            if (funcionarioDb == null) return NotFound();
-
-            // Atualiza a propriedade no Db pela requisição
-            funcionarioDb.Nome = funcionario.Nome;
-            funcionarioDb.DataContratacao = funcionario.DataContratacao;
-            funcionarioDb.Email = funcionario.Email;
-            funcionarioDb.CargoId = funcionario.CargoId;
-
-            _context.Funcionarios.Update(funcionarioDb);
-            _context.SaveChanges();
-
-            return Ok(funcionarioDb);
-        }
-
-    // Buscar por ID
-        [HttpGet("ObterCargo{id}")]
-        public IActionResult ObterCargoId (int id)
-        {
-            var cargo = _context.Cargos.Find(id);
-            if (cargo == null) return NotFound();
+                    int rowsAffected = command.ExecuteNonQuery();
+                    if (rowsAffected == 0) return NotFound();
+                }
+            }
             return Ok(cargo);
         }
 
-        [HttpGet("ObterDepartamento{id}")]
-        public IActionResult ObterDepartamentoId (int id)
+        [HttpPut("AtualizarDepartamento/{id}")]
+        public IActionResult AtualizarDepartamento(int id, Departamentos departamento)
         {
-            var departamento = _context.Departamentos.Find(id);
-            if (departamento == null) return NotFound();
+            using (SqlConnection connection = new SqlConnection(_context.Database.GetDbConnection().ConnectionString))
+            {
+                connection.Open();
+                string sql = "UPDATE Departamentos SET nome = @Nome WHERE departamento_id = @DepartamentoId;";
+                using (SqlCommand command = new SqlCommand(sql, connection))
+                {
+                    command.Parameters.AddWithValue("@DepartamentoId", id);
+                    command.Parameters.AddWithValue("@Nome", departamento.Nome);
+
+                    int rowsAffected = command.ExecuteNonQuery();
+                    if (rowsAffected == 0) return NotFound();
+                }
+            }
             return Ok(departamento);
         }
 
-        [HttpGet("ObterFuncionario{id}")]
-        public IActionResult ObterFuncionarioId (int id)
+        [HttpPut("AtualizarFuncionario/{id}")]
+        public IActionResult AtualizarFuncionario(int id, Funcionarios funcionario)
         {
-            var funcionario = _context.Funcionarios.Find(id);
-            if (funcionario == null) return NotFound();
+            using (SqlConnection connection = new SqlConnection(_context.Database.GetDbConnection().ConnectionString))
+            {
+                connection.Open();
+                string sql = "UPDATE Funcionarios SET nome = @Nome, data_contratacao = @DataContratacao, email = @Email, cargo_id = @CargoId WHERE funcionario_id = @FuncionarioId;";
+                using (SqlCommand command = new SqlCommand(sql, connection))
+                {
+                    command.Parameters.AddWithValue("@FuncionarioId", id);
+                    command.Parameters.AddWithValue("@Nome", funcionario.Nome);
+                    command.Parameters.AddWithValue("@DataContratacao", funcionario.DataContratacao);
+                    command.Parameters.AddWithValue("@Email", funcionario.Email);
+                    command.Parameters.AddWithValue("@CargoId", funcionario.CargoId);
+
+                    int rowsAffected = command.ExecuteNonQuery();
+                    if (rowsAffected == 0) return NotFound();
+                }
+            }
             return Ok(funcionario);
         }
 
-    // Buscar por Nome
-        [HttpGet("ObterCargoPorNome")]
-        public IActionResult ObterCargoPorNome (string nome)
+        // Obter
+        [HttpGet("ObterCargo/{id}")]
+        public IActionResult ObterCargoPorId(int id)
         {
-            var cargo = _context.Cargos.Where(x => x.Nome.Contains(nome));
-            if (cargo == null) return NotFound();
-            return Ok(cargo);
+            using (SqlConnection connection = new SqlConnection(_context.Database.GetDbConnection().ConnectionString))
+            {
+                connection.Open();
+                string sql = "SELECT * FROM Cargos WHERE cargo_id = @CargoId;";
+                using (SqlCommand command = new SqlCommand(sql, connection))
+                {
+                    command.Parameters.AddWithValue("@CargoId", id);
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            Cargos cargo = new Cargos
+                            {
+                                CargoId = (int)reader["cargo_id"],
+                                DepartamentoId = (int)reader["departamento_id"],
+                                Nome = (string)reader["nome"],
+                                Salario = (int)reader["salario"]
+                            };
+                            return Ok(cargo);
+                        }
+                        else return NotFound();
+                    }
+                }
+            }
+        }
+
+        [HttpGet("ObterDepartamento/{id}")]
+        public IActionResult ObterDepartamentoPorId(int id)
+        {
+            using (SqlConnection connection = new SqlConnection(_context.Database.GetDbConnection().ConnectionString))
+            {
+                connection.Open();
+                string sql = "SELECT * FROM Departamentos WHERE departamento_id = @DepartamentoId;";
+                using (SqlCommand command = new SqlCommand(sql, connection))
+                {
+                    command.Parameters.AddWithValue("@DepartamentoId", id);
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            Departamentos departamento = new Departamentos
+                            {
+                                DepartamentoId = (int)reader["departamento_id"],
+                                Nome = (string)reader["nome"]
+                            };
+                            return Ok(departamento);
+                        }
+                        else return NotFound();
+                    }
+                }
+            }
+        }
+
+        [HttpGet("ObterFuncionario/{id}")]
+        public IActionResult ObterFuncionarioPorId(int id)
+        {
+            using (SqlConnection connection = new SqlConnection(_context.Database.GetDbConnection().ConnectionString))
+            {
+                connection.Open();
+                string sql = "SELECT * FROM Funcionarios WHERE funcionario_id = @FuncionarioId;";
+                using (SqlCommand command = new SqlCommand(sql, connection))
+                {
+                    command.Parameters.AddWithValue("@FuncionarioId", id);
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            Funcionarios funcionario = new Funcionarios
+                            {
+                                FuncionarioId = (int)reader["funcionario_id"],
+                                Nome = (string)reader["nome"],
+                                DataContratacao = (DateTime)reader["data_contratacao"],
+                                Email = (string)reader["email"],
+                                CargoId = (int)reader["cargo_id"]
+                            };
+                            return Ok(funcionario);
+                        }
+                        else return NotFound();
+                    }
+                }
+            }
+        }
+
+        // Buscar por Nome
+        [HttpGet("ObterCargoPorNome")]
+        public IActionResult ObterCargoPorNome(string nome)
+        {
+            using (SqlConnection connection = new SqlConnection(_context.Database.GetDbConnection().ConnectionString))
+            {
+                connection.Open();
+                string sql = "SELECT * FROM Cargos WHERE nome LIKE @Nome;";
+                using (SqlCommand command = new SqlCommand(sql, connection))
+                {
+                    command.Parameters.AddWithValue("@Nome", "%" + nome + "%");
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        List<Cargos> cargos = new List<Cargos>();
+                        while (reader.Read())
+                        {
+                            Cargos cargo = new Cargos
+                            {
+                                CargoId = (int)reader["cargo_id"],
+                                DepartamentoId = (int)reader["departamento_id"],
+                                Nome = (string)reader["nome"],
+                                Salario = (int)reader["salario"]
+                            };
+                            cargos.Add(cargo);
+                        }
+                        return Ok(cargos);
+                    }
+                }
+            }
         }
 
         [HttpGet("ObterDepartamentoPorNome")]
-        public IActionResult ObterDepartamentoPorNome (string nome)
+        public IActionResult ObterDepartamentoPorNome(string nome)
         {
-            var departamento = _context.Departamentos.Where(x => x.Nome.Contains(nome));
-            if (departamento == null) return NotFound();
-            return Ok(departamento);
+            using (SqlConnection connection = new SqlConnection(_context.Database.GetDbConnection().ConnectionString))
+            {
+                connection.Open();
+                string sql = "SELECT * FROM Departamentos WHERE nome LIKE @Nome;";
+                using (SqlCommand command = new SqlCommand(sql, connection))
+                {
+                    command.Parameters.AddWithValue("@Nome", "%" + nome + "%");
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        List<Departamentos> departamentos = new List<Departamentos>();
+                        while (reader.Read())
+                        {
+                            Departamentos departamento = new Departamentos
+                            {
+                                DepartamentoId = (int)reader["departamento_id"],
+                                Nome = (string)reader["nome"]
+                            };
+                            departamentos.Add(departamento);
+                        }
+                        return Ok(departamentos);
+                    }
+                }
+            }
         }
 
         [HttpGet("ObterFuncionarioPorNome")]
-        public IActionResult ObterFuncionarioPorNome (string nome)
+        public IActionResult ObterFuncionarioPorNome(string nome)
         {
-            var funcionario = _context.Funcionarios.Where(x => x.Nome.Contains(nome));
-            if (funcionario == null) return NotFound();
-            return Ok(funcionario);
+            using (SqlConnection connection = new SqlConnection(_context.Database.GetDbConnection().ConnectionString))
+            {
+                connection.Open();
+                string sql = "SELECT * FROM Funcionarios WHERE nome LIKE @Nome;";
+                using (SqlCommand command = new SqlCommand(sql, connection))
+                {
+                    command.Parameters.AddWithValue("@Nome", "%" + nome + "%");
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        List<Funcionarios> funcionarios = new List<Funcionarios>();
+                        while (reader.Read())
+                        {
+                            Funcionarios funcionario = new Funcionarios
+                            {
+                                FuncionarioId = (int)reader["funcionario_id"],
+                                Nome = (string)reader["nome"],
+                                DataContratacao = (DateTime)reader["data_contratacao"],
+                                Email = (string)reader["email"],
+                                CargoId = (int)reader["cargo_id"]
+                            };
+                            funcionarios.Add(funcionario);
+                        }
+                        return Ok(funcionarios);
+                    }
+                }
+            }
         }
 
         [HttpGet("ObterCargoPorSalario")]
         public IActionResult ObterCargoPorSalario(int salario)
         {
-            var cargo = _context.Cargos.Where(c => c.salario > salario).ToList();
-            if (cargo == null || cargo.Count == 0) return NotFound();
-            return Ok(cargo);
+            using (SqlConnection connection = new SqlConnection(_context.Database.GetDbConnection().ConnectionString))
+            {
+                connection.Open();
+                string sql = "SELECT * FROM Cargos WHERE salario > @Salario;";
+                using (SqlCommand command = new SqlCommand(sql, connection))
+                {
+                    command.Parameters.AddWithValue("@Salario", salario);
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        List<Cargos> cargos = new List<Cargos>();
+                        while (reader.Read())
+                        {
+                            Cargos cargo = new Cargos
+                            {
+                                CargoId = (int)reader["cargo_id"],
+                                DepartamentoId = (int)reader["departamento_id"],
+                                Nome = (string)reader["nome"],
+                                Salario = (int)reader["salario"]
+                            };
+                            cargos.Add(cargo);
+                        }
+
+                        if (cargos.Count > 0) return Ok(cargos);
+                        else return NotFound();
+                    }
+                }
+            }
         }
     }
 }

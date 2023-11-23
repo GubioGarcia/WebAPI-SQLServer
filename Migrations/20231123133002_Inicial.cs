@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace API_SQLServer.Migrations
 {
     /// <inheritdoc />
-    public partial class CriacaoTablesABCInc : Migration
+    public partial class Inicial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -17,7 +17,7 @@ namespace API_SQLServer.Migrations
                 {
                     departamento_id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    nome = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    nome = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -31,7 +31,7 @@ namespace API_SQLServer.Migrations
                     cargo_id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     departamento_id = table.Column<int>(type: "int", nullable: false),
-                    nome = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    nome = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     salario = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -51,9 +51,9 @@ namespace API_SQLServer.Migrations
                 {
                     funcionario_id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    nome = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    nome = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     data_contratacao = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    email = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     cargo_id = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>

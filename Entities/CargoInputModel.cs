@@ -1,28 +1,24 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace API_SQLServer.Entities
 {
-    public class Cargos
+    public class CargoInputModel
     {
-        [Column("cargo_id")]
+        [Required]
         [Key]
         public int CargoId { get; set; }
 
-        [Column("departamento_id")]
+        [Required]
         public int DepartamentoId { get; set; }
 
-        [Column("nome")]
+        [Required]
         public string Nome { get; set; }
 
-        [Column("salario")]
+        [Required]
         public int Salario { get; set; }
-
-        // Propriedade de navegação para o relacionamento com Departamentos
-        public Departamentos Departamento { get; set; }
     }
 }

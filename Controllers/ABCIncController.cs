@@ -22,7 +22,7 @@ namespace API_SQLServer.Controllers
 
         // Criar
         [HttpPost("CriarCargo")]
-        public IActionResult CriarCargo(Cargos cargo)
+        public IActionResult CriarCargo([FromBody] CargoInputModel cargoInput)
         {
             using (SqlConnection connection = new SqlConnection(_context.Database.GetDbConnection().ConnectionString))
             {
@@ -30,17 +30,17 @@ namespace API_SQLServer.Controllers
                 string sql = "INSERT INTO Cargos (departamento_id, nome, salario) VALUES (@DepartamentoId, @Nome, @Salario);";
                 using (SqlCommand command = new SqlCommand(sql, connection))
                 {
-                    command.Parameters.AddWithValue("@DepartamentoId", cargo.DepartamentoId);
-                    command.Parameters.AddWithValue("@Nome", cargo.Nome);
-                    command.Parameters.AddWithValue("@Salario", cargo.Salario);
+                    command.Parameters.AddWithValue("@DepartamentoId", cargoInput.DepartamentoId);
+                    command.Parameters.AddWithValue("@Nome", cargoInput.Nome);
+                    command.Parameters.AddWithValue("@Salario", cargoInput.Salario);
                     command.ExecuteNonQuery();
                 }
             }
-            return Ok(cargo);
+            return Ok(cargoInput);
         }
 
         [HttpPost("CriarDepartamento")]
-        public IActionResult CriarDepartamento(Departamentos departamento)
+        public IActionResult CriarDepartamento([FromBody] DepartamentoInputModel departamentoInput)
         {
             using (SqlConnection connection = new SqlConnection(_context.Database.GetDbConnection().ConnectionString))
             {
@@ -48,15 +48,15 @@ namespace API_SQLServer.Controllers
                 string sql = "INSERT INTO Departamentos (nome) VALUES (@Nome);";
                 using (SqlCommand command = new SqlCommand(sql, connection))
                 {
-                    command.Parameters.AddWithValue("@Nome", departamento.Nome);
+                    command.Parameters.AddWithValue("@Nome", departamentoInput.Nome);
                     command.ExecuteNonQuery();
                 }
             }
-            return Ok(departamento);
+            return Ok(departamentoInput);
         }
 
         [HttpPost("CriarFuncionario")]
-        public IActionResult CriarFuncionario(Funcionarios funcionario)
+        public IActionResult CriarFuncionario([FromBody] FuncionarioInputModel funcionarioInput)
         {
             using (SqlConnection connection = new SqlConnection(_context.Database.GetDbConnection().ConnectionString))
             {
@@ -64,14 +64,14 @@ namespace API_SQLServer.Controllers
                 string sql = "INSERT INTO Funcionarios (nome, data_contratacao, email, cargo_id) VALUES (@Nome, @DataContratacao, @Email, @CargoId);";
                 using (SqlCommand command = new SqlCommand(sql, connection))
                 {
-                    command.Parameters.AddWithValue("@Nome", funcionario.Nome);
-                    command.Parameters.AddWithValue("@DataContratacao", funcionario.DataContratacao);
-                    command.Parameters.AddWithValue("@Email", funcionario.Email);
-                    command.Parameters.AddWithValue("@CargoId", funcionario.CargoId);
+                    command.Parameters.AddWithValue("@Nome", funcionarioInput.Nome);
+                    command.Parameters.AddWithValue("@DataContratacao", funcionarioInput.DataContratacao);
+                    command.Parameters.AddWithValue("@Email", funcionarioInput.Email);
+                    command.Parameters.AddWithValue("@CargoId", funcionarioInput.CargoId);
                     command.ExecuteNonQuery();
                 }
             }
-            return Ok(funcionario);
+            return Ok(funcionarioInput);
         }
 
         // Deletar
@@ -128,7 +128,7 @@ namespace API_SQLServer.Controllers
 
         // Atualizar
         [HttpPut("AtualizarCargo/{id}")]
-        public IActionResult AtualizarCargo(int id, Cargos cargo)
+        public IActionResult AtualizarCargo(int id, [FromBody] CargoInputModel cargoInput)
         {
             using (SqlConnection connection = new SqlConnection(_context.Database.GetDbConnection().ConnectionString))
             {
@@ -137,19 +137,19 @@ namespace API_SQLServer.Controllers
                 using (SqlCommand command = new SqlCommand(sql, connection))
                 {
                     command.Parameters.AddWithValue("@CargoId", id);
-                    command.Parameters.AddWithValue("@DepartamentoId", cargo.DepartamentoId);
-                    command.Parameters.AddWithValue("@Nome", cargo.Nome);
-                    command.Parameters.AddWithValue("@Salario", cargo.Salario);
+                    command.Parameters.AddWithValue("@DepartamentoId", cargoInput.DepartamentoId);
+                    command.Parameters.AddWithValue("@Nome", cargoInput.Nome);
+                    command.Parameters.AddWithValue("@Salario", cargoInput.Salario);
 
                     int rowsAffected = command.ExecuteNonQuery();
                     if (rowsAffected == 0) return NotFound();
                 }
             }
-            return Ok(cargo);
+            return Ok(cargoInput);
         }
 
         [HttpPut("AtualizarDepartamento/{id}")]
-        public IActionResult AtualizarDepartamento(int id, Departamentos departamento)
+        public IActionResult AtualizarDepartamento(int id, [FromBody] DepartamentoInputModel departamentoInput)
         {
             using (SqlConnection connection = new SqlConnection(_context.Database.GetDbConnection().ConnectionString))
             {
@@ -158,17 +158,17 @@ namespace API_SQLServer.Controllers
                 using (SqlCommand command = new SqlCommand(sql, connection))
                 {
                     command.Parameters.AddWithValue("@DepartamentoId", id);
-                    command.Parameters.AddWithValue("@Nome", departamento.Nome);
+                    command.Parameters.AddWithValue("@Nome", departamentoInput.Nome);
 
                     int rowsAffected = command.ExecuteNonQuery();
                     if (rowsAffected == 0) return NotFound();
                 }
             }
-            return Ok(departamento);
+            return Ok(departamentoInput);
         }
 
         [HttpPut("AtualizarFuncionario/{id}")]
-        public IActionResult AtualizarFuncionario(int id, Funcionarios funcionario)
+        public IActionResult AtualizarFuncionario(int id, [FromBody] FuncionarioInputModel funcionarioInput)
         {
             using (SqlConnection connection = new SqlConnection(_context.Database.GetDbConnection().ConnectionString))
             {
@@ -177,116 +177,28 @@ namespace API_SQLServer.Controllers
                 using (SqlCommand command = new SqlCommand(sql, connection))
                 {
                     command.Parameters.AddWithValue("@FuncionarioId", id);
-                    command.Parameters.AddWithValue("@Nome", funcionario.Nome);
-                    command.Parameters.AddWithValue("@DataContratacao", funcionario.DataContratacao);
-                    command.Parameters.AddWithValue("@Email", funcionario.Email);
-                    command.Parameters.AddWithValue("@CargoId", funcionario.CargoId);
+                    command.Parameters.AddWithValue("@Nome", funcionarioInput.Nome);
+                    command.Parameters.AddWithValue("@DataContratacao", funcionarioInput.DataContratacao);
+                    command.Parameters.AddWithValue("@Email", funcionarioInput.Email);
+                    command.Parameters.AddWithValue("@CargoId", funcionarioInput.CargoId);
 
                     int rowsAffected = command.ExecuteNonQuery();
                     if (rowsAffected == 0) return NotFound();
                 }
             }
-            return Ok(funcionario);
+            return Ok(funcionarioInput);
         }
 
         // Obter
-        [HttpGet("ObterCargo/{id}")]
-        public IActionResult ObterCargoPorId(int id)
+        [HttpGet("ListarCargos")]
+        public IActionResult ListarCargos()
         {
             using (SqlConnection connection = new SqlConnection(_context.Database.GetDbConnection().ConnectionString))
             {
                 connection.Open();
-                string sql = "SELECT * FROM Cargos WHERE cargo_id = @CargoId;";
+                string sql = "SELECT * FROM Cargos;";
                 using (SqlCommand command = new SqlCommand(sql, connection))
                 {
-                    command.Parameters.AddWithValue("@CargoId", id);
-                    using (SqlDataReader reader = command.ExecuteReader())
-                    {
-                        if (reader.Read())
-                        {
-                            Cargos cargo = new Cargos
-                            {
-                                CargoId = (int)reader["cargo_id"],
-                                DepartamentoId = (int)reader["departamento_id"],
-                                Nome = (string)reader["nome"],
-                                Salario = (int)reader["salario"]
-                            };
-                            return Ok(cargo);
-                        }
-                        else return NotFound();
-                    }
-                }
-            }
-        }
-
-        [HttpGet("ObterDepartamento/{id}")]
-        public IActionResult ObterDepartamentoPorId(int id)
-        {
-            using (SqlConnection connection = new SqlConnection(_context.Database.GetDbConnection().ConnectionString))
-            {
-                connection.Open();
-                string sql = "SELECT * FROM Departamentos WHERE departamento_id = @DepartamentoId;";
-                using (SqlCommand command = new SqlCommand(sql, connection))
-                {
-                    command.Parameters.AddWithValue("@DepartamentoId", id);
-                    using (SqlDataReader reader = command.ExecuteReader())
-                    {
-                        if (reader.Read())
-                        {
-                            Departamentos departamento = new Departamentos
-                            {
-                                DepartamentoId = (int)reader["departamento_id"],
-                                Nome = (string)reader["nome"]
-                            };
-                            return Ok(departamento);
-                        }
-                        else return NotFound();
-                    }
-                }
-            }
-        }
-
-        [HttpGet("ObterFuncionario/{id}")]
-        public IActionResult ObterFuncionarioPorId(int id)
-        {
-            using (SqlConnection connection = new SqlConnection(_context.Database.GetDbConnection().ConnectionString))
-            {
-                connection.Open();
-                string sql = "SELECT * FROM Funcionarios WHERE funcionario_id = @FuncionarioId;";
-                using (SqlCommand command = new SqlCommand(sql, connection))
-                {
-                    command.Parameters.AddWithValue("@FuncionarioId", id);
-                    using (SqlDataReader reader = command.ExecuteReader())
-                    {
-                        if (reader.Read())
-                        {
-                            Funcionarios funcionario = new Funcionarios
-                            {
-                                FuncionarioId = (int)reader["funcionario_id"],
-                                Nome = (string)reader["nome"],
-                                DataContratacao = (DateTime)reader["data_contratacao"],
-                                Email = (string)reader["email"],
-                                CargoId = (int)reader["cargo_id"]
-                            };
-                            return Ok(funcionario);
-                        }
-                        else return NotFound();
-                    }
-                }
-            }
-        }
-
-        // Buscar por Nome
-        [HttpGet("ObterCargoPorNome")]
-        public IActionResult ObterCargoPorNome(string nome)
-        {
-            using (SqlConnection connection = new SqlConnection(_context.Database.GetDbConnection().ConnectionString))
-            {
-                connection.Open();
-                string sql = "SELECT * FROM Cargos WHERE nome LIKE @Nome;";
-                using (SqlCommand command = new SqlCommand(sql, connection))
-                {
-                    command.Parameters.AddWithValue("@Nome", "%" + nome + "%");
                     using (SqlDataReader reader = command.ExecuteReader())
                     {
                         List<Cargos> cargos = new List<Cargos>();
@@ -301,22 +213,22 @@ namespace API_SQLServer.Controllers
                             };
                             cargos.Add(cargo);
                         }
+
                         return Ok(cargos);
                     }
                 }
             }
         }
 
-        [HttpGet("ObterDepartamentoPorNome")]
-        public IActionResult ObterDepartamentoPorNome(string nome)
+        [HttpGet("ListarDepartamentos")]
+        public IActionResult ListarDepartamentos()
         {
             using (SqlConnection connection = new SqlConnection(_context.Database.GetDbConnection().ConnectionString))
             {
                 connection.Open();
-                string sql = "SELECT * FROM Departamentos WHERE nome LIKE @Nome;";
+                string sql = "SELECT * FROM Departamentos;";
                 using (SqlCommand command = new SqlCommand(sql, connection))
                 {
-                    command.Parameters.AddWithValue("@Nome", "%" + nome + "%");
                     using (SqlDataReader reader = command.ExecuteReader())
                     {
                         List<Departamentos> departamentos = new List<Departamentos>();
@@ -329,22 +241,22 @@ namespace API_SQLServer.Controllers
                             };
                             departamentos.Add(departamento);
                         }
+
                         return Ok(departamentos);
                     }
                 }
             }
         }
 
-        [HttpGet("ObterFuncionarioPorNome")]
-        public IActionResult ObterFuncionarioPorNome(string nome)
+        [HttpGet("ListarFuncionarios")]
+        public IActionResult ListarFuncionarios()
         {
             using (SqlConnection connection = new SqlConnection(_context.Database.GetDbConnection().ConnectionString))
             {
                 connection.Open();
-                string sql = "SELECT * FROM Funcionarios WHERE nome LIKE @Nome;";
+                string sql = "SELECT * FROM Funcionarios;";
                 using (SqlCommand command = new SqlCommand(sql, connection))
                 {
-                    command.Parameters.AddWithValue("@Nome", "%" + nome + "%");
                     using (SqlDataReader reader = command.ExecuteReader())
                     {
                         List<Funcionarios> funcionarios = new List<Funcionarios>();
@@ -360,14 +272,15 @@ namespace API_SQLServer.Controllers
                             };
                             funcionarios.Add(funcionario);
                         }
+
                         return Ok(funcionarios);
                     }
                 }
             }
         }
 
-        [HttpGet("ObterCargoPorSalario")]
-        public IActionResult ObterCargoPorSalario(int salario)
+        [HttpGet("ObterCargosPorSalario")]
+        public IActionResult ObterCargosPorSalario(int salario)
         {
             using (SqlConnection connection = new SqlConnection(_context.Database.GetDbConnection().ConnectionString))
             {
@@ -393,6 +306,103 @@ namespace API_SQLServer.Controllers
 
                         if (cargos.Count > 0) return Ok(cargos);
                         else return NotFound();
+                    }
+                }
+            }
+        }
+
+        [HttpGet("ObterFuncionariosPorSalario")]
+        public IActionResult ObterFuncionariosPorSalario(int salario)
+        {
+            using (SqlConnection connection = new SqlConnection(_context.Database.GetDbConnection().ConnectionString))
+            {
+                connection.Open();
+                string sql = "SELECT * FROM Funcionarios INNER JOIN Cargos ON Funcionarios.cargo_id = Cargos.cargo_id WHERE Cargos.salario > @Salario;";
+                using (SqlCommand command = new SqlCommand(sql, connection))
+                {
+                    command.Parameters.AddWithValue("@Salario", salario);
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        List<Funcionarios> funcionarios = new List<Funcionarios>();
+                        while (reader.Read())
+                        {
+                            Funcionarios funcionario = new Funcionarios
+                            {
+                                FuncionarioId = (int)reader["funcionario_id"],
+                                Nome = (string)reader["nome"],
+                                DataContratacao = (DateTime)reader["data_contratacao"],
+                                CargoId = (int)reader["cargo_id"]
+                                // Você pode adicionar mais propriedades conforme necessário
+                            };
+                            funcionarios.Add(funcionario);
+                        }
+
+                        if (funcionarios.Count > 0) return Ok(funcionarios);
+                        else return NotFound();
+                    }
+                }
+            }
+        }
+
+        [HttpGet("ListarFuncionariosPorCargo/{cargoId}")]
+        public IActionResult ListarFuncionariosPorCargo(int cargoId)
+        {
+            using (SqlConnection connection = new SqlConnection(_context.Database.GetDbConnection().ConnectionString))
+            {
+                connection.Open();
+                string sql = "SELECT * FROM Funcionarios WHERE cargo_id = @CargoId;";
+                using (SqlCommand command = new SqlCommand(sql, connection))
+                {
+                    command.Parameters.AddWithValue("@CargoId", cargoId);
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        List<Funcionarios> funcionarios = new List<Funcionarios>();
+                        while (reader.Read())
+                        {
+                            Funcionarios funcionario = new Funcionarios
+                            {
+                                FuncionarioId = (int)reader["funcionario_id"],
+                                Nome = (string)reader["nome"],
+                                DataContratacao = (DateTime)reader["data_contratacao"],
+                                Email = (string)reader["email"],
+                                CargoId = (int)reader["cargo_id"]
+                            };
+                            funcionarios.Add(funcionario);
+                        }
+
+                        return Ok(funcionarios);
+                    }
+                }
+            }
+        }
+
+        [HttpGet("ListarFuncionariosPorDepartamento/{departamentoId}")]
+        public IActionResult ListarFuncionariosPorDepartamento(int departamentoId)
+        {
+            using (SqlConnection connection = new SqlConnection(_context.Database.GetDbConnection().ConnectionString))
+            {
+                connection.Open();
+                string sql = "SELECT Funcionarios.* FROM Funcionarios INNER JOIN Cargos ON Funcionarios.cargo_id = Cargos.cargo_id WHERE Cargos.departamento_id = @DepartamentoId;";
+                using (SqlCommand command = new SqlCommand(sql, connection))
+                {
+                    command.Parameters.AddWithValue("@DepartamentoId", departamentoId);
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        List<Funcionarios> funcionarios = new List<Funcionarios>();
+                        while (reader.Read())
+                        {
+                            Funcionarios funcionario = new Funcionarios
+                            {
+                                FuncionarioId = (int)reader["funcionario_id"],
+                                Nome = (string)reader["nome"],
+                                DataContratacao = (DateTime)reader["data_contratacao"],
+                                Email = (string)reader["email"],
+                                CargoId = (int)reader["cargo_id"]
+                            };
+                            funcionarios.Add(funcionario);
+                        }
+
+                        return Ok(funcionarios);
                     }
                 }
             }

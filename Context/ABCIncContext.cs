@@ -14,31 +14,5 @@ namespace API_SQLServer.Context
         public DbSet<Funcionarios> Funcionarios { get; set; }
         public DbSet<Cargos> Cargos { get; set; }
         public DbSet<Departamentos> Departamentos { get; set; }
-
-        // Configuração dos relacionamentos
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            // Configuração da tabela Departamentos
-            modelBuilder.Entity<Departamentos>()
-                .HasKey(d => d.DepartamentoId);
-
-            // Configuração da tabela Cargos
-            modelBuilder.Entity<Cargos>()
-                .HasKey(c => c.CargoId);
-
-            modelBuilder.Entity<Cargos>()
-                .HasOne(c => c.Departamento)
-                .WithMany()
-                .HasForeignKey(c => c.DepartamentoId);
-
-            // Configuração da tabela Funcionarios
-            modelBuilder.Entity<Funcionarios>()
-                .HasKey(f => f.FuncionarioId);
-
-            modelBuilder.Entity<Funcionarios>()
-                .HasOne(f => f.Cargo)
-                .WithMany()
-                .HasForeignKey(f => f.CargoId);
-        }
     }
 }

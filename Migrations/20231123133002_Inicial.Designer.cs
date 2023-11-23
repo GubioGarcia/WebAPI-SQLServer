@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace API_SQLServer.Migrations
 {
     [DbContext(typeof(ABCIncContext))]
-    [Migration("20231122142717_CriacaoTablesABCInc")]
-    partial class CriacaoTablesABCInc
+    [Migration("20231123133002_Inicial")]
+    partial class Inicial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -39,7 +39,6 @@ namespace API_SQLServer.Migrations
                         .HasColumnName("departamento_id");
 
                     b.Property<string>("Nome")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("nome");
 
@@ -64,7 +63,6 @@ namespace API_SQLServer.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DepartamentoId"));
 
                     b.Property<string>("Nome")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("nome");
 
@@ -91,12 +89,10 @@ namespace API_SQLServer.Migrations
                         .HasColumnName("data_contratacao");
 
                     b.Property<string>("Email")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("email");
 
                     b.Property<string>("Nome")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("nome");
 
